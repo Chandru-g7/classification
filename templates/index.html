@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Role Classifier</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .cont {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #2d2d2d;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #6e8efb, #a777e3);
+            border-radius: 2px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        label {
+            font-size: 1.1rem;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        input[type="file"] {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="file"]:hover {
+            border-color: #6e8efb;
+            background: #e6f0fa;
+            transform: scale(1.02);
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #6e8efb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #5a7de8;
+        }
+
+        button {
+            background: linear-gradient(90deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(110, 142, 251, 0.4);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .view-button {
+            margin-top: 30px;
+        }
+
+        .view-button a {
+            display: inline-block;
+            text-decoration: none;
+            background: linear-gradient(90deg, #28a745, #34c759);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .view-button a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Pop-up Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeInModal 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: #d9534f;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-content button {
+            background: linear-gradient(90deg, #d9534f, #c9302c);
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+
+        .modal-content button:hover {
+            box-shadow: 0 8px 20px rgba(217, 83, 79, 0.4);
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .cont {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            button, .view-button a {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                padding: 20px;
+                width: 85%;
+            }
+        }
+
+        /* Subtle background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 15s infinite ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.1; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cont">
+        <h1>Job Role Classifier</h1>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <label><strong>Upload Template Data (.xlsx)</strong></label>
+            <input type="file" name="template_file" accept=".xlsx" required>
+
+            <label><strong>Upload Real-Time Data (.csv)</strong></label>
+            <input type="file" name="realtime_file" accept=".csv" required>
+
+            <button type="submit">Train and Predict</button>
+        </form>
+
+        <!-- View Result button only shown when file_ready is True -->
+        {% if file_ready %}
+        <div class="view-button">
+            <a href="{{ url_for('view_result') }}" target="_blank">🔍 View Result</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Error Pop-up Modal -->
+    <div class="modal" id="errorModal">
+        <div class="modal-content">
+            <h2>Error</h2>
+            <p id="errorMessage"></p>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to show the error modal
+        function showErrorModal(message) {
+            const modal = document.getElementById('errorModal');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message || 'An unknown error occurred.';
+            modal.style.display = 'flex';
+        }
+
+        // Function to close the error modal
+        function closeModal() {
+            const modal = document.getElementById('errorModal');
+            modal.style.display = 'none';
+        }
+
+        // Check if there's an error message passed from the backend
+        
+
+        // Client-side validation for file types
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            const templateFile = document.querySelector('input[name="template_file"]').files[0];
+            const realtimeFile = document.querySelector('input[name="realtime_file"]').files[0];
+
+            if (templateFile && !templateFile.name.endsWith('.xlsx')) {
+                event.preventDefault();
+                showErrorModal('Please upload a valid .xlsx file for Template Data.');
+            } else if (realtimeFile && !realtimeFile.name.endsWith('.csv')) {
+                event.preventDefault();
+                showErrorModal('Please upload a valid .csv file for Real-Time Data.');
+            }
+        });
+    </script>
+</body>
+</html>
